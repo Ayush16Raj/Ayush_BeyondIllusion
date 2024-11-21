@@ -6,6 +6,8 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -46,15 +48,22 @@ fun GitHubMainScreen(viewModel: GitHubViewModel = androidx.lifecycle.viewmodel.c
     val repos by viewModel.repos.collectAsState() //collecting stateflow from kotlin coroutines and converting it into compose object
     val error by viewModel.error.collectAsState()
     var query by remember { mutableStateOf("") }
+    val isLoading by viewModel.isLoading.collectAsState()
+
 
     Column(modifier = Modifier.fillMaxSize()) {
         SearchScreen(
             query = query,
             onQueryChanged = { query = it },
-            onSearch = { viewModel.fetchRepos(query) }
+            onSearch = {
+                viewModel.fetchRepos(query)
+            }
         )
+        if(isLoading){
+            progressBar()
+        }
 
-        if (error != null) {
+       else if (error != null) {
             Text(
                 text = error!!,
                 color = MaterialTheme.colorScheme.error,
@@ -64,6 +73,14 @@ fun GitHubMainScreen(viewModel: GitHubViewModel = androidx.lifecycle.viewmodel.c
             RepoListScreen(repos = repos)
         }
     }
+}
+@Composable
+fun progressBar(){
+        CircularProgressIndicator(
+            modifier = Modifier.width(64.dp),
+            color = MaterialTheme.colorScheme.secondary,
+            trackColor = MaterialTheme.colorScheme.surfaceVariant,
+        )
 }
 
 

@@ -20,16 +20,25 @@ class GitHubViewModel @Inject constructor(
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error
 
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
+
     fun fetchRepos(username: String) {
         viewModelScope.launch {
+            _isLoading.value = true   //progressbar show
             try {
                 _error.value = null
                 val response = repository.getRepos(username)
                 _repos.value = response
+                if (response.isEmpty()){
+                    _error.value = "No Repository Found" // Handle if no repository found
+                }
             } catch (e: Exception) {
-                Log.e("Hello", e.toString())
+                Log.e("Error", e.toString())
                 _error.value = "Failed to load repositories."
                 _repos.value = emptyList()
+            } finally {
+                _isLoading.value = false// progress bar hide
             }
         }
     }
