@@ -80,6 +80,10 @@ dependencies {
     //Dagger hilt dependency injection
     implementation("com.google.dagger:hilt-android:2.51.1")
     kapt("com.google.dagger:hilt-android-compiler:2.51.1")
+
+    //Navigation
+    implementation("androidx.navigation:navigation-compose:2.8.4")
+
 }
 kapt {
     correctErrorTypes = true

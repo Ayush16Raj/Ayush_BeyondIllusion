@@ -3,22 +3,22 @@ package com.example.ayushassignment
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Column
+import androidx.activity.viewModels
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.ayushassignment.screens.RepoListScreen
 import com.example.ayushassignment.screens.SearchScreen
 import com.example.ayushassignment.ui.theme.AyushAssignmentTheme
@@ -29,6 +29,7 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val viewModel: GitHubViewModel by viewModels()
         setContent {
             AyushAssignmentTheme {
                 // A surface container using the 'background' color from the theme
@@ -36,7 +37,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-               GitHubMainScreen()
+                     GitHubNavGraph(viewModel)
                 }
             }
         }
@@ -44,43 +45,47 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun GitHubMainScreen(viewModel: GitHubViewModel = androidx.lifecycle.viewmodel.compose.viewModel()) {
-    val repos by viewModel.repos.collectAsState() //collecting stateflow from kotlin coroutines and converting it into compose object
-    val error by viewModel.error.collectAsState()
-    var query by remember { mutableStateOf("") }
-    val isLoading by viewModel.isLoading.collectAsState()
-
-
-    Column(modifier = Modifier.fillMaxSize()) {
-        SearchScreen(
-            query = query,
-            onQueryChanged = { query = it },
-            onSearch = {
-                viewModel.fetchRepos(query)
-            }
-        )
-        if(isLoading){
-            progressBar()
-        }
-
-       else if (error != null) {
-            Text(
-                text = error!!,
-                color = MaterialTheme.colorScheme.error,
-                modifier = Modifier.padding(16.dp)
-            )
-        } else {
-            RepoListScreen(repos = repos)
-        }
-    }
-}
-@Composable
 fun progressBar(){
-        CircularProgressIndicator(
+    Box(
+        modifier = Modifier.fillMaxSize(), // Make the box take full screen
+        contentAlignment = Alignment.Center // Center content inside the box
+    ){
+    CircularProgressIndicator(
             modifier = Modifier.width(64.dp),
             color = MaterialTheme.colorScheme.secondary,
-            trackColor = MaterialTheme.colorScheme.surfaceVariant,
+            trackColor = MaterialTheme.colorScheme.surfaceVariant
         )
+}
+}
+@Composable
+fun GitHubNavGraph(viewModel: GitHubViewModel) {
+    val navController = rememberNavController()
+
+    NavHost(
+        navController = navController,
+        startDestination = "search_screen"
+    ) {
+        // SearchScreen Route
+        composable("search_screen") {
+            SearchScreen { username ->
+                viewModel.fetchRepos(username) // Fetch repositories
+                navController.navigate("repo_list_screen/$username") // Pass username
+            }
+        }
+
+        // RepoListScreen Route
+        composable(
+            route = "repo_list_screen/{username}",
+            arguments = listOf(navArgument("username") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val username = backStackEntry.arguments?.getString("username") ?: ""
+            RepoListScreen(
+                viewModel = viewModel,
+                username = username,
+                onBack = { navController.popBackStack() }
+            )
+        }
+    }
 }
 
 
