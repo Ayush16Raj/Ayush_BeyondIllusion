@@ -84,6 +84,13 @@ dependencies {
     //Navigation
     implementation("androidx.navigation:navigation-compose:2.8.4")
 
+    // Room
+    implementation ("androidx.room:room-runtime:2.6.1")
+    kapt ("androidx.room:room-compiler:2.6.1")
+
+    // Optional - Room with Kotlin Coroutines support
+    implementation ("androidx.room:room-ktx:2.6.1")
+
 }
 kapt {
     correctErrorTypes = true
