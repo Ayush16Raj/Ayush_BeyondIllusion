@@ -16,7 +16,6 @@ class GitHubViewModel @Inject constructor(
     private val repository: GitHubRepository) : ViewModel() {
     private val _repos = MutableStateFlow<List<RepoData>>(emptyList()) //it is private so it can only be modified internally inside viewmodel
     val repos: StateFlow<List<RepoData>> = _repos // it ensure that external code(UI) can observe changes but cannot modify the state directly
-
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error
 
@@ -42,4 +41,8 @@ class GitHubViewModel @Inject constructor(
             }
         }
     }
+    fun onSort(){
+        _repos.value = _repos.value.sortedByDescending { it.name}
+    }
+
 }

@@ -82,7 +82,8 @@ fun GitHubNavGraph(viewModel: GitHubViewModel) {
             RepoListScreen(
                 viewModel = viewModel,
                 username = username,
-                onBack = { navController.popBackStack() }
+                onBack = { navController.popBackStack() },
+                onSort = {viewModel.onSort()}
             )
         }
     }

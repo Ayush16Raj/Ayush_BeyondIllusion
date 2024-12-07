@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -33,6 +34,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -46,6 +49,7 @@ fun RepoListScreen(
     viewModel: GitHubViewModel,
     username: String,
     onBack: () -> Unit // Callback for back navigation
+    ,onSort: () -> Unit
 ) {
     val isLoading by viewModel.isLoading.collectAsState() //collecting stateflow from kotlin coroutines and converting it into compose object
     val error by viewModel.error.collectAsState()
@@ -53,7 +57,8 @@ fun RepoListScreen(
 
     Scaffold(topBar = {
         TopBar(title = username,
-            onBack = onBack)
+            onBack = onBack,
+        onSort = onSort)
     }) {innerPadding->
         Column(modifier = Modifier
             .fillMaxSize()
@@ -115,7 +120,8 @@ fun RepoItem(repo: RepoData) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopBar(title:String,
-           onBack: () -> Unit) {
+           onBack: () -> Unit,
+           onSort: () -> Unit) {
 
     // Choose drawable resources based on the theme
     val githubIcon = if (isSystemInDarkTheme()) painterResource(id = R.drawable.github_icon_dark) else painterResource(id = R.drawable.github_icon_light)
@@ -141,9 +147,14 @@ fun TopBar(title:String,
                 actions = {
                    Icon(painter = githubIcon, contentDescription = "GithubIcon",
                        Modifier.size(35.dp))
+                    IconButton(onClick = { onSort() }) {
+                        Icon(imageVector = Icons.Default.KeyboardArrowUp, contentDescription ="sort")
+
+                    }
                 }
 
 
             )
         }
+
 
