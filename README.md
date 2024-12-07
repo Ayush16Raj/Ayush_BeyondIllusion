@@ -14,6 +14,8 @@ An Android app to search GitHub repositories by username, fetch data from the Gi
   - Star count.
 - Dark/Light theme support.
 - Built with modern Android development practices.
+- Data store as cache to access when No Internet.
+- Sorting of data by name.
 
 ---
 
@@ -49,6 +51,9 @@ The project follows the **MVVM (Model-View-ViewModel)** architecture pattern for
 | **Material3**      | Modern UI components and theming.        |
 | **Coroutines**     | Asynchronous programming.                |
 | **StateFlow**      | Managing UI state reactively.            |
+| **Room Database**  | Offline data access                      |
+
+
 
 ---
 
@@ -59,4 +64,5 @@ The project follows the **MVVM (Model-View-ViewModel)** architecture pattern for
 
 2. **Dark/Light Mode**:  
    - The app supports both themes based on system settings.
+
 
